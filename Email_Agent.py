@@ -28,3 +28,14 @@ def calendar_summary_agent(state: AgentState) -> AgentState:
     prompt = f"Summarize today's schedule based on these emails, listing time-sensitive items first and then other important notes. Be concise and use bullet points:\n{emails}"
     summary = llm.invoke(prompt).content
     return {"result": summary, "emails": emails} # Ensure emails is also returned
+
+builder = StateGraph(AgentState)
+builder.add_node("calendar", calendar_summary_agent)
+builder.set_entry_point("calendar")
+builder.set_finish_point("calendar") # END is implicit if not set explicitly
+
+graph = builder.compile()
+
+# Run the graph using your simulated email data
+result = graph.invoke({"emails": emails})
+print(result["result"])
